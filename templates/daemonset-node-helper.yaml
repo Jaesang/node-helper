@@ -1,0 +1,45 @@
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: node-helper
+spec:
+  template:
+    metadata:
+      labels:
+        app: test 
+    spec:
+      initContainers:
+      - name: node-helper
+        image: ubuntu:xenial
+        command: 
+          - /tmp/mount.sh
+        volumeMounts:
+          - name: bin
+            mountPath: /tmp/mount.sh
+            subPath: mount.sh
+          - name: mnt
+            mountPath: /mnt
+          - name: tmp
+            mountPath: /tmp
+      containers:
+      - name: node-executor
+        image: ubuntu:xenial
+        command: [ "/bin/bash", "-c", "--" ]
+        args: [ "while true; do sleep 30; done;" ]
+        volumeMounts:
+          - name: mnt
+            mountPath: /mnt
+          - name: tmp
+            mountPath: /tmp
+      volumes:
+        - name: mnt
+          hostPath:
+            path: /mnt
+        - name: tmp
+          hostPath:
+            path: /tmp
+        - name: bin
+          configMap:
+            name: bin
+            defaultMode: 0555
+        

@@ -1,0 +1,16 @@
+{{- define "helm-toolkit.utils.template" -}}
+{{- $name := index . 0 -}}
+{{- $context := index . 1 -}}
+{{- $last := base $context.Template.Name }}
+{{- $wtf := $context.Template.Name | replace $last $name -}}
+{{ include $wtf $context }}
+{{- end -}}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bin
+data:
+  mount.sh: |+
+{{ tuple "bin/_mount.sh.tpl" . | include "helm-toolkit.utils.template" | indent 4 }}
